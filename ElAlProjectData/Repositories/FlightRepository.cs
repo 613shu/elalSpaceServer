@@ -64,6 +64,11 @@ namespace ElAlProjectData.Repositories
                 .FirstOrDefaultAsync(f => f.Id == id, cancellationToken);
         }
 
+        public void ClearTracking()
+        {
+            _dataContext.ChangeTracker.Clear();
+        }
+
 
 
         //pagination

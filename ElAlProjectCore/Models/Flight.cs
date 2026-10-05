@@ -22,6 +22,8 @@ namespace ElAlProjectCore.Models
         public FlightStatus FlightStatus { get; set; }
         public double Price { get; set; }
 
+        public uint Version { get; set; }
+
 
     }
 }

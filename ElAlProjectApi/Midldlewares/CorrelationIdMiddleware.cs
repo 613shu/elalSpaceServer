@@ -1,4 +1,4 @@
-namespace SukotSystemApi.Middlewares
+namespace ElAlProjectApi.Middlewares
 {
     // Runs on every request. Makes sure every request has a CorrelationId,
     // puts it on the response header, and pushes it into the logging scope
@@ -6,7 +6,7 @@ namespace SukotSystemApi.Middlewares
     // middleware, from a controller, from a service - carries the same id.
     public class CorrelationIdMiddleware
     {
-        //נותן מזהה ייחודי לכל request
+        // Name of the header that carries the correlation id on every request/response
         public const string HeaderName = "X-Correlation-Id";
 
         private readonly RequestDelegate _next;

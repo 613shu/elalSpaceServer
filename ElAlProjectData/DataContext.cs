@@ -19,6 +19,10 @@ namespace ElAlProjectData
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Amenity> Amenities { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Flight>().Property(f => f.Version).IsRowVersion();
+        }
 
 
     }

@@ -15,6 +15,8 @@ namespace ElAlProjectCore.Repositories
 
         Task<Flight?> GetFlightForUpdate(int id, CancellationToken cancellationToken);
 
+        void ClearTracking();
+
         Task<(IEnumerable<Flight> Items, int TotalCount)> GetAllFlightsPaged(int page, int pageSize, CancellationToken cancellationToken);
 
         Task<(IEnumerable<Flight> Items, int TotalCount)> GetAvailableFlightsPaged(DateTime departsAfter, int page, int pageSize, CancellationToken cancellationToken);

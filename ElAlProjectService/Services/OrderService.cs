@@ -23,42 +23,48 @@ namespace ElAlProjectService.Services
             _mapper = mapper;
         }
 
+        //שניים שמתחרים 
         public async Task<PassengerResponse_OrderDTO> AddOrder(int passengerId, PassengerRequest_OrderDTO order, CancellationToken cancellationToken)
         {
             var flight = await _flightRepository.GetFlightForUpdate(order.FlightId, cancellationToken);
 
             if (flight == null)
                 throw new KeyNotFoundException($"Flight with id {order.FlightId} was not found.");
-
-            if (flight.FlightStatus != FlightStatus.Scheduled || flight.DepartureTime <= DateTime.UtcNow)
-                throw new InvalidOperationException("This flight is not open for booking.");
-
-            if (await _orderRepository.PassengerHasOrder(passengerId, flight.Id, cancellationToken))
-                throw new InvalidOperationException("You already have an order for this flight.");
-
-            if (flight.AvailableSeats <= 0)
-                throw new InvalidOperationException("No seats available on this flight.");
-
-            flight.AvailableSeats--;
-
-            var newOrder = new Order
+            //יכולות הזמנות להתפס מקסימום כמספר המקומות
+            while (flight.AvailableSeats > 0)
             {
-                FlightId = flight.Id,
-                PassengerId = passengerId,
-                OrderDateTime = DateTime.UtcNow,
-                Status = OrderStatus.Confirmed
-            };
+                if (flight.FlightStatus != FlightStatus.Scheduled || flight.DepartureTime <= DateTime.UtcNow)
+                    throw new InvalidOperationException("This flight is not open for booking.");
 
-            try
-            {
-                await _orderRepository.AddOrder(newOrder, cancellationToken);
+                if (await _orderRepository.PassengerHasOrder(passengerId, flight.Id, cancellationToken))
+                    throw new InvalidOperationException("You already have an order for this flight.");
+
+                flight.AvailableSeats--;
+
+                var newOrder = new Order
+                {
+                    FlightId = flight.Id,
+                    PassengerId = passengerId,
+                    OrderDateTime = DateTime.UtcNow,
+                    Status = OrderStatus.Confirmed
+                };
+
+                try
+                {
+                    await _orderRepository.AddOrder(newOrder, cancellationToken);
+                    return _mapper.Map<PassengerResponse_OrderDTO>(newOrder);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    _flightRepository.ClearTracking();
+                    flight = await _flightRepository.GetFlightForUpdate(order.FlightId, cancellationToken);
+
+                    if (flight == null)
+                        throw new KeyNotFoundException($"Flight with id {order.FlightId} was not found.");
+                }
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw new InvalidOperationException("The seat was taken by another passenger. Please try again.");
-            }
 
-            return _mapper.Map<PassengerResponse_OrderDTO>(newOrder);
+            throw new InvalidOperationException("No seats available on this flight.");
         }
 
         public async Task<AdminResponse_OrderDTO> GetOrderById(int id, CancellationToken cancellationToken)

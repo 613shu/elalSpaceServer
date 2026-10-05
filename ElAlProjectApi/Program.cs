@@ -2,6 +2,7 @@ using System.Text;
 using ElAlProjectCore.Repositories;
 using ElAlProjectCore.Services;
 using ElAlProjectData;
+using ElAlProjectApi.Middlewares;
 using ElAlProjectData.Repositories;
 using ElAlProjectService.Mapping;
 using ElAlProjectService.Services;
@@ -82,6 +83,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCorrelationId();
+app.UseGlobalExceptionHandling();
 
 app.UseHttpsRedirection();
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Text.Json;
 
-namespace SukotSystemApi.Middlewares
+namespace ElAlProjectApi.Middlewares
 {
     // The single place in the whole server that turns "something went wrong"
     // into an HTTP response. Every exception that reaches here was NOT handled
@@ -38,14 +38,21 @@ namespace SukotSystemApi.Middlewares
                     "The resource was changed by another user. Please refresh and try again.",
                     LogLevel.Warning); // Part D: every conflict is logged at Warning, not Error.
             }
-            // Also 409, but a different flavor of conflict: a business rule was violated
-            // against the current state of the data (e.g. a duplicate phone on the Rabbi
-            // roster, or claiming/completing an Order that is no longer in the right status)
-            // rather than a lost optimistic-concurrency race. Thrown deliberately by the
-            // Service layer - not a bug.
-         
+            // 409: a business rule was violated against the current state of the data
+            // (e.g. duplicate email, seat already taken, order already cancelled).
+            // Thrown deliberately by the Service layer - not a bug.
+            catch (InvalidOperationException ex)
+            {
+                await WriteErrorAsync(context, ex, HttpStatusCode.Conflict, ex.Message, LogLevel.Warning);
+            }
+            // 400: invalid input detected by the Service layer (e.g. arrival before departure).
+            catch (ArgumentException ex)
+            {
+                await WriteErrorAsync(context, ex, HttpStatusCode.BadRequest, ex.Message, LogLevel.Warning);
+            }
+
             // Business-level "not found" - thrown deliberately by the Service
-            // layer (see CustomerService.GetCustomerById), not a real failure.
+            // layer (e.g. FlightService), not a real failure.
             catch (KeyNotFoundException ex)
             {
                 await WriteErrorAsync(context, ex, HttpStatusCode.NotFound, ex.Message, LogLevel.Warning);
@@ -113,6 +120,13 @@ namespace SukotSystemApi.Middlewares
 
             await context.Response.WriteAsync(JsonSerializer.Serialize(body));
         }
+    }
+
+    public class ApiErrorResponse
+    {
+        public int StatusCode { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string CorrelationId { get; set; } = string.Empty;
     }
 
     public static class ExceptionHandlingMiddlewareExtensions
