@@ -56,7 +56,7 @@ namespace ElAlProjectService.Services
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    _flightRepository.ClearTracking();
+                    _flightRepository.ClearTracking();//סקופ אחד כל הבקשה מתעסק מול אויבקט דטה של הטיסה, כלומר יש שאריות מהורזן הלא נכון
                     flight = await _flightRepository.GetFlightForUpdate(order.FlightId, cancellationToken);
 
                     if (flight == null)
