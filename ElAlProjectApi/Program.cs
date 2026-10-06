@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog.Web;
+using ElAlProjectApi.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,13 @@ builder.Services.AddAuthorization();
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await context.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(context);
+}
 
 if (app.Environment.IsDevelopment())
 {
