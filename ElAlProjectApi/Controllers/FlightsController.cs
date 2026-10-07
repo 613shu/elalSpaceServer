@@ -25,7 +25,7 @@ namespace ElAlProjectApi.Controllers;
             var flight = await _flightService.GetFlightById(id, ct);
             return Ok(flight);
         }
-
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
         {
