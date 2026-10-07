@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElAlProjectApi", "ElAlProjectApi\ElAlProjectApi.csproj", "{5F4FEE9B-37CC-4554-AD09-6D88D1D25517}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElAlProjectApi", "ElAlProjectApi\ElAlProjectApi.csproj", "{5F4FEE9B-37CC-4554-AD09-6D88D1D25517}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElAlProjectService", "ElAlProjectService\ElAlProjectService.csproj", "{C458EC02-7ED9-4861-A26A-5E669B677452}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElAlProjectService", "ElAlProjectService\ElAlProjectService.csproj", "{C458EC02-7ED9-4861-A26A-5E669B677452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElAlProjectCore", "ElAlProjectCore\ElAlProjectCore.csproj", "{9654E9A9-D792-451D-95D1-1BF5C49BB8B1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElAlProjectCore", "ElAlProjectCore\ElAlProjectCore.csproj", "{9654E9A9-D792-451D-95D1-1BF5C49BB8B1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElAlProjectData", "ElAlProjectData\ElAlProjectData.csproj", "{E03E988D-0B9E-459C-AE54-412C70B1A814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElAlProjectData", "ElAlProjectData\ElAlProjectData.csproj", "{E03E988D-0B9E-459C-AE54-412C70B1A814}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElAlProjectTests", "ElAlProjectTests\ElAlProjectTests.csproj", "{B81A0086-FD1F-49D8-BBAA-A7FBD095B448}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E03E988D-0B9E-459C-AE54-412C70B1A814}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E03E988D-0B9E-459C-AE54-412C70B1A814}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E03E988D-0B9E-459C-AE54-412C70B1A814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B81A0086-FD1F-49D8-BBAA-A7FBD095B448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B81A0086-FD1F-49D8-BBAA-A7FBD095B448}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B81A0086-FD1F-49D8-BBAA-A7FBD095B448}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B81A0086-FD1F-49D8-BBAA-A7FBD095B448}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
