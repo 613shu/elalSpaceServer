@@ -10,6 +10,7 @@ namespace ElAlProjectCore.DTOs.RequstDTOs
     public class AuthRequestDTO
     {
         [Required]
+        [StringLength(100)]
         public string Name { get; set; }
 
         [Required]
@@ -18,6 +19,7 @@ namespace ElAlProjectCore.DTOs.RequstDTOs
 
         [Required]
         [EmailAddress]
+        [StringLength(256)]
         public string Email { get; set; }
     }
 }

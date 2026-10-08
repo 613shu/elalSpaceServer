@@ -33,6 +33,14 @@ namespace ElAlProjectApi.Controllers;
             return Ok(new { items, totalCount });
         }
 
+        [AllowAnonymous]
+        [HttpGet("available")]
+        public async Task<IActionResult> GetAvailable([FromQuery] int page = 1, [FromQuery] int pageSize = 10, CancellationToken ct = default)
+        {
+            var (items, totalCount) = await _flightService.GetAvailableFlights(page, pageSize, ct);
+            return Ok(new { items, totalCount });
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] AdminRequest_FlightDTO request, CancellationToken ct)

@@ -27,6 +27,16 @@ namespace ElAlProjectApi.Helpers
                 });
             }
 
+            if (!await context.Passengers.AnyAsync(p => p.Email == "passenger@gmail.com"))
+            {
+                context.Passengers.Add(new Passenger
+                {
+                    Name = "נוסע לדוגמה",
+                    Email = "passenger@gmail.com",
+                    Passward = PasswordHasher.Hash("111222")
+                });
+            }
+
             if (!await context.Flights.AnyAsync())
             {
                 var amenities = await context.Amenities.ToListAsync();

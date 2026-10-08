@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ElAlProjectCore.DTOs.ResponseDTOs.AdminResponseDTOs;
+using ElAlProjectCore.DTOs.ResponseDTOs.PassengerResonseDTOs;
 using ElAlProjectCore.Repositories;
 using ElAlProjectCore.Services;
 
@@ -31,6 +32,16 @@ namespace ElAlProjectService.Services
             var (items, totalCount) = await _passengerRepository.GetAllPassengersPaged(page, pageSize, cancellationToken);
 
             return (_mapper.Map<IEnumerable<AdminResponse_PassengerDTO>>(items), totalCount);
+        }
+
+        public async Task<PassengerResponse_PassengerDTO> GetMyProfile(int passengerId, CancellationToken cancellationToken)
+        {
+            var passenger = await _passengerRepository.GetPassengerById(passengerId, cancellationToken);
+
+            if (passenger == null)
+                throw new KeyNotFoundException($"Passenger with id {passengerId} was not found.");
+
+            return _mapper.Map<PassengerResponse_PassengerDTO>(passenger);
         }
 
         public async Task DeletePassenger(int id, CancellationToken cancellationToken)
