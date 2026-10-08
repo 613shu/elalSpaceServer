@@ -246,7 +246,14 @@ erDiagram
 | GET | `/api/amenities`, `/api/amenities/{id}` | ציבורי |
 | POST / PUT / DELETE | `/api/amenities[/{id}]` | Admin |
 
-### Passengers / Admins: `/api/passengers`, `/api/admins`
+### Passengers: `/api/passengers`
+| Method | Route | הרשאה | תיאור |
+|---|---|---|---|
+| GET | `/api/passengers/me` | Passenger | הפרופיל של הנוסע המחובר |
+| GET | `/api/passengers`, `/api/passengers/{id}` | Admin | רשימת נוסעים ונוסע בודד |
+| DELETE | `/api/passengers/{id}` | Admin | מחיקה רכה |
+
+### Admins: `/api/admins`
 | Method | Route | הרשאה |
 |---|---|---|
 | GET | רשימה ופריט בודד | Admin |
@@ -311,7 +318,7 @@ erDiagram
 - **JWT:** הטוקן חתום ב-HMAC-SHA256 ותקף 60 דקות. השרת מאמת issuer, audience, תוקף וחתימה. ה-claims: `NameIdentifier`, `Name`, `Email`, `Role`.
 - **שני תפקידים עם הרשאות שונות באמת:**
   - **Admin:** ניהול טיסות ושירותים, צפייה בכל הנוסעים וההזמנות, ביטול כל הזמנה.
-  - **Passenger:** הזמנה, צפייה בהזמנות שלו וביטולן בלבד.
+  - **Passenger:** צפייה בפרופיל שלו, הזמנה, וצפייה בהזמנות שלו וביטולן בלבד.
 - **ההרשאות נאכפות בשרת** באמצעות `[Authorize(Roles = ...)]`. הבעלות על הזמנה נבדקת ב-Service ומחזירה 403.
 - **סיסמאות:** נשמרות רק כ-hash של PBKDF2 עם salt ייחודי לכל משתמש. ההשוואה נעשית ב-`CryptographicOperations.FixedTimeEquals`.
 - **סודות:** מחרוזת החיבור ומפתח ה-JWT לא נמצאים בקוד ולא ב-repository. בפיתוח הם נשמרים ב-**User Secrets**.

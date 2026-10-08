@@ -12,14 +12,12 @@ namespace ElAlProjectService.Services
     {
         private readonly IFlightRepository _flightRepository;
         private readonly IAmenityRepository _amenityRepository;
-        private readonly IOrderRepository _orderRepository;
         private readonly IMapper _mapper;
 
-        public FlightService(IFlightRepository flightRepository, IAmenityRepository amenityRepository, IOrderRepository orderRepository, IMapper mapper)
+        public FlightService(IFlightRepository flightRepository, IAmenityRepository amenityRepository, IMapper mapper)
         {
             _flightRepository = flightRepository;
             _amenityRepository = amenityRepository;
-            _orderRepository = orderRepository;
             _mapper = mapper;
         }
 
@@ -73,8 +71,6 @@ namespace ElAlProjectService.Services
         {
             if (!await _flightRepository.DeleteFlight(id, cancellationToken))
                 throw new KeyNotFoundException($"Flight with id {id} was not found.");
-
-            await _orderRepository.CancelFlightOrders(id, cancellationToken);
         }
 
         private async Task<Flight> MapFlight(AdminRequest_FlightDTO flight, CancellationToken cancellationToken)

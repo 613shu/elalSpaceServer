@@ -22,7 +22,5 @@ namespace ElAlProjectCore.Repositories
         Task<(IEnumerable<Order> Items, int TotalCount)> GetAllOrdersPaged(int page, int pageSize, CancellationToken cancellationToken);
 
         Task<bool> DeleteOrder(int id, CancellationToken cancellationToken);
-
-        Task CancelFlightOrders(int flightId, CancellationToken cancellationToken);
     }
 }

@@ -111,7 +111,8 @@ namespace ElAlProjectData.Repositories
 
 
 
-        // Soft delete: the flight stays in the database with status Cancelled.
+        // Soft delete: the flight stays in the database with status Cancelled,
+        // and all its confirmed orders are cancelled in the same transaction.
         // Returns false when the flight does not exist or is already cancelled
         public async Task<bool> DeleteFlight(int id, CancellationToken cancellationToken)
         {
@@ -121,9 +122,18 @@ namespace ElAlProjectData.Repositories
             if (existing == null)
                 return false;
 
-            existing.FlightStatus = FlightStatus.Cancelled;
+            await using var transaction = await _dataContext.Database.BeginTransactionAsync(cancellationToken);
 
+            existing.FlightStatus = FlightStatus.Cancelled;
             await _dataContext.SaveChangesAsync(cancellationToken);
+
+            await _dataContext.Orders
+                .Where(o => o.FlightId == id && o.Status == OrderStatus.Confirmed)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(o => o.Status, OrderStatus.Cancelled)
+                    .SetProperty(o => o.CancelledAt, (DateTime?)DateTime.UtcNow), cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
 
             return true;
         }

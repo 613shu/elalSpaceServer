@@ -113,15 +113,5 @@ namespace ElAlProjectData.Repositories
             return true;
         }
 
-
-
-        public async Task CancelFlightOrders(int flightId, CancellationToken cancellationToken)
-        {
-            await _dataContext.Orders
-                .Where(o => o.FlightId == flightId && o.Status == OrderStatus.Confirmed)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(o => o.Status, OrderStatus.Cancelled)
-                    .SetProperty(o => o.CancelledAt, (DateTime?)DateTime.UtcNow), cancellationToken);
-        }
     }
 }

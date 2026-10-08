@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 using System.Net;
 using System.Text.Json;
@@ -37,6 +38,13 @@ namespace ElAlProjectApi.Middlewares
                     HttpStatusCode.Conflict,
                     "The resource was changed by another user. Please refresh and try again.",
                     LogLevel.Warning); // Part D: every conflict is logged at Warning, not Error.
+            }
+            // 409: two requests tried to create the same unique value at the same moment
+            // (e.g. two registrations with the same email). The unique index in the
+            // database blocked the second one; this is a conflict, not a server failure.
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation })
+            {
+                await WriteErrorAsync(context, ex, HttpStatusCode.Conflict, "A record with the same details already exists.", LogLevel.Warning);
             }
             // 409: a business rule was violated against the current state of the data
             // (e.g. duplicate email, seat already taken, order already cancelled).
