@@ -57,11 +57,12 @@ namespace ElAlProjectApi.Middlewares
             {
                 await WriteErrorAsync(context, ex, HttpStatusCode.NotFound, ex.Message, LogLevel.Warning);
             }
-            // Wrong credentials / no permission - also an expected, handled
-            // outcome, not a bug in the server.
+            // 403: the user is logged in but is not allowed to touch this resource
+            // (e.g. someone else's order). Wrong credentials never reach here -
+            // AuthController answers them with 401 directly.
             catch (UnauthorizedAccessException ex)
             {
-                await WriteErrorAsync(context, ex, HttpStatusCode.Unauthorized, ex.Message, LogLevel.Warning);
+                await WriteErrorAsync(context, ex, HttpStatusCode.Forbidden, ex.Message, LogLevel.Warning);
             }
             // Anything else is, by definition, a bug or an unexpected failure -
             // this is the only branch that logs at Error level.

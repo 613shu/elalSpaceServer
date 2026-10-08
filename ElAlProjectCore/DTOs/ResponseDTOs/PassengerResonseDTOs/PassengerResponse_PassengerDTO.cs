@@ -13,5 +13,6 @@ namespace ElAlProjectCore.DTOs.ResponseDTOs.PassengerResonseDTOs
         public string Name { get; set; }
         public string Email { get; set; }
         public bool IsActive { get; set; }
+        public List<PassengerResponse_OrderDTO>? Orders { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace ElAlProjectData
         public DbSet<Amenity> Amenities { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Flight>().Property(f => f.Version).IsRowVersion();
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
         }
 
 

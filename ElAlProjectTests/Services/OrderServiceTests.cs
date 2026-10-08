@@ -6,6 +6,7 @@ using ElAlProjectCore.Repositories;
 using ElAlProjectService.Mapping;
 using ElAlProjectService.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -19,6 +20,7 @@ namespace ElAlProjectTests.Services
 
         private readonly Mock<IOrderRepository> _orderRepository = new();
         private readonly Mock<IFlightRepository> _flightRepository = new();
+        private readonly Mock<ILogger<OrderService>> _logger = new();
         private readonly OrderService _service;
         private readonly PassengerRequest_OrderDTO _request = new() { FlightId = FlightId };
 
@@ -30,7 +32,7 @@ namespace ElAlProjectTests.Services
                 .Setup(r => r.AddOrder(It.IsAny<Order>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync((Order order, CancellationToken _) => order);
 
-            _service = new OrderService(_orderRepository.Object, _flightRepository.Object, mapper);
+            _service = new OrderService(_orderRepository.Object, _flightRepository.Object, mapper, _logger.Object);
         }
 
         private static Flight CreateFlight(int availableSeats)
@@ -76,6 +78,23 @@ namespace ElAlProjectTests.Services
                 .ReturnsAsync(order);
         }
 
+        private void SetupOrderForRead(Order? order)
+        {
+            _orderRepository
+                .Setup(r => r.GetOrderById(OrderId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(order);
+        }
+
+        private void VerifyWarningLogged(Times times)
+        {
+            _logger.Verify(l => l.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.IsAny<It.IsAnyType>(),
+                It.IsAny<Exception?>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()), times);
+        }
+
         private void VerifyOrderSaved(Times times)
         {
             _orderRepository.Verify(r => r.AddOrder(It.IsAny<Order>(), It.IsAny<CancellationToken>()), times);
@@ -91,6 +110,7 @@ namespace ElAlProjectTests.Services
 
             Assert.Equal("Confirmed", result.Status);
             Assert.Equal(0, flight.AvailableSeats);
+            VerifyWarningLogged(Times.Never());
             _orderRepository.Verify(r => r.AddOrder(
                 It.Is<Order>(o => o.FlightId == FlightId && o.PassengerId == PassengerId && o.Status == OrderStatus.Confirmed),
                 It.IsAny<CancellationToken>()), Times.Once);
@@ -186,6 +206,7 @@ namespace ElAlProjectTests.Services
             Assert.Equal("Confirmed", result.Status);
             Assert.Equal(0, freshFlight.AvailableSeats);
             _flightRepository.Verify(r => r.ClearTracking(), Times.Once);
+            VerifyWarningLogged(Times.Once());
             _flightRepository.Verify(r => r.GetFlightForUpdate(FlightId, It.IsAny<CancellationToken>()), Times.Exactly(2));
             VerifyOrderSaved(Times.Exactly(2));
         }
@@ -208,7 +229,46 @@ namespace ElAlProjectTests.Services
 
             Assert.Equal("No seats available on this flight.", exception.Message);
             _flightRepository.Verify(r => r.ClearTracking(), Times.Once);
+            VerifyWarningLogged(Times.Once());
             VerifyOrderSaved(Times.Once());
+        }
+
+        [Fact]
+        public async Task GetOrderById_WhenOwnerAsks_ReturnsOrder()
+        {
+            SetupOrderForRead(CreateOrder(CreateFlight(0)));
+
+            var result = await _service.GetOrderById(OrderId, PassengerId, false, CancellationToken.None);
+
+            Assert.Equal(OrderId, result.Id);
+        }
+
+        [Fact]
+        public async Task GetOrderById_WhenAnotherPassengerAsks_Throws()
+        {
+            SetupOrderForRead(CreateOrder(CreateFlight(0)));
+
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(
+                () => _service.GetOrderById(OrderId, PassengerId + 1, false, CancellationToken.None));
+        }
+
+        [Fact]
+        public async Task GetOrderById_WhenAdminAsks_ReturnsOrder()
+        {
+            SetupOrderForRead(CreateOrder(CreateFlight(0)));
+
+            var result = await _service.GetOrderById(OrderId, PassengerId + 1, true, CancellationToken.None);
+
+            Assert.Equal(OrderId, result.Id);
+        }
+
+        [Fact]
+        public async Task GetOrderById_WhenOrderNotFound_ThrowsKeyNotFound()
+        {
+            SetupOrderForRead(null);
+
+            await Assert.ThrowsAsync<KeyNotFoundException>(
+                () => _service.GetOrderById(OrderId, PassengerId, false, CancellationToken.None));
         }
 
         [Fact]

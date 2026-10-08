@@ -26,7 +26,7 @@ namespace ElAlProjectApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken ct)
         {
-            var order = await _orderService.GetOrderById(id, ct);
+            var order = await _orderService.GetOrderById(id, CurrentUserId, IsAdmin, ct);
             return Ok(order);
         }
 

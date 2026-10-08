@@ -17,7 +17,6 @@ namespace ElAlProjectCore.DTOs.ResponseDTOs.AdminResponseDTOs
         public DateTime ArrivalTime { get; set; }
         public int NumOfSeats { get; set; }
         public int AvailableSeats { get; set; }
-        public List<AdminResponse_PassengerDTO> Passengers { get; set; }
         public List<AdminResponse_AmenityDTO> Amenities { get; set; }
         public string FlightStatus { get; set; }
         public double Price { get; set; }

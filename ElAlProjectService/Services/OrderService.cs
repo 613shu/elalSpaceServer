@@ -7,6 +7,7 @@ using ElAlProjectCore.Models;
 using ElAlProjectCore.Repositories;
 using ElAlProjectCore.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace ElAlProjectService.Services
 {
@@ -15,12 +16,14 @@ namespace ElAlProjectService.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IFlightRepository _flightRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IOrderRepository orderRepository, IFlightRepository flightRepository, IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IFlightRepository flightRepository, IMapper mapper, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _flightRepository = flightRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         //שניים שמתחרים 
@@ -56,6 +59,7 @@ namespace ElAlProjectService.Services
                 }
                 catch (DbUpdateConcurrencyException)
                 {
+                    _logger.LogWarning("Seat conflict on flight {FlightId} for passenger {PassengerId}. Retrying with fresh data.", order.FlightId, passengerId);
                     _flightRepository.ClearTracking();//סקופ אחד כל הבקשה מתעסק מול אויבקט דטה של הטיסה, כלומר יש שאריות מהורזן הלא נכון
                     flight = await _flightRepository.GetFlightForUpdate(order.FlightId, cancellationToken);
 
@@ -67,12 +71,15 @@ namespace ElAlProjectService.Services
             throw new InvalidOperationException("No seats available on this flight.");
         }
 
-        public async Task<AdminResponse_OrderDTO> GetOrderById(int id, CancellationToken cancellationToken)
+        public async Task<AdminResponse_OrderDTO> GetOrderById(int id, int passengerId, bool isAdmin, CancellationToken cancellationToken)
         {
             var order = await _orderRepository.GetOrderById(id, cancellationToken);
 
             if (order == null)
                 throw new KeyNotFoundException($"Order with id {id} was not found.");
+
+            if (!isAdmin && order.PassengerId != passengerId)
+                throw new UnauthorizedAccessException("You can view only your own orders.");
 
             return _mapper.Map<AdminResponse_OrderDTO>(order);
         }

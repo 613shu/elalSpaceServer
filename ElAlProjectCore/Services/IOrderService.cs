@@ -8,7 +8,7 @@ namespace ElAlProjectCore.Services
     {
         Task<PassengerResponse_OrderDTO> AddOrder(int passengerId, PassengerRequest_OrderDTO order, CancellationToken cancellationToken);
 
-        Task<AdminResponse_OrderDTO> GetOrderById(int id, CancellationToken cancellationToken);
+        Task<AdminResponse_OrderDTO> GetOrderById(int id, int passengerId, bool isAdmin, CancellationToken cancellationToken);
 
         Task<(IEnumerable<PassengerResponse_OrderDTO> Items, int TotalCount)> GetPassengerOrders(int passengerId, int page, int pageSize, CancellationToken cancellationToken);
 

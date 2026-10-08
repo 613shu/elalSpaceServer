@@ -17,7 +17,6 @@ namespace ElAlProjectCore.Models
         public DateTime ArrivalTime { get; set; }
         public int NumOfSeats { get; set; }
         public int AvailableSeats { get; set; }
-        public List<Passenger> Passengers { get; set; }
         public List<Amenity> Amenities { get; set; }
         public FlightStatus FlightStatus { get; set; }
         public double Price { get; set; }
